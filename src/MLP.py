@@ -48,8 +48,43 @@ class MultiLayerPerceptron:
                 for j in range(self.layers[i]):
                     self.network[i].append(Perceptron(self.layers[i-1], bias))
             # self.network.append([Perceptron(layers[i], bias) for j in range(layers[i+1])])
-            # self.values.append([0.0 for j in range(layers[i+1])])
-
-        
+            # self.values.append([0.0 for j in range(layers[i+1])])        
         self.network = np.array([np.array(x) for x in self.network],dtype=object)
         self.values = np.array([np.array(x) for x in self.values],dtype=object)
+    def setWeights(self, w_init):
+        """Set the weights. weights is a python list with the weights."""
+        # weights for layer i , j nuron  = weights[i-1][j] of size k
+        # so w_init will be a list of lists of lists   
+        for i in range(1,len(self.network)):
+            for j in range(len(self.network[i])):
+                self.network[i][j].set_weights(w_init[i-1][j])
+                self.network[i][j].bias = self.bias
+    
+    def printWeights(self):
+        for i in range(1,len(self.network)):
+            for j in range(len(self.network[i])):
+                print("Layer",i+1,"Neuron",j,"Weights:",self.network[i][j].weights)
+
+    def run(self, x):
+        """Run the MLP. x is a python list with the input values."""
+        x = np.array(x,dtype=object)
+        self.values[0] = x
+        # for layer i 1-->n: for neuron j 1-->m: run the neuron
+        # weights of that neuron dot inputs of that layer + bias\
+        Nlayers = len(self.network)
+        for i in range(1,Nlayers):
+            NNeurons = len(self.network[i])
+            for j in range(NNeurons):
+                currentNeuron = self.network[i][j]
+                self.values[i][j]= currentNeuron.run(self.values[i-1])
+        return self.values[-1]
+    
+
+#test code
+mlp = MultiLayerPerceptron([2,2,1])
+mlp.setWeights([[[-100,-100,150],[15,15,-10]],[[10,10,-15]]])
+mlp.printWeights()
+print(mlp.run([0,0]))
+print(mlp.run([0,1]))
+print(mlp.run([1,0]))
+print(mlp.run([1,1]))

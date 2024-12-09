@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  linkedinnnpython01:
+    image: linkedinnnpython01
+    build:
+      context: .
+      dockerfile: ./Dockerfile
